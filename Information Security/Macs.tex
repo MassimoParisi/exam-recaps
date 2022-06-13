@@ -1,0 +1,27 @@
+\section{Macs}
+A Message Authentication Code (MAC) is a short piece of information used for authenticating a message. It uses a shared secret key to provide integrity and authenticity, but differently from symmetric encryption it is not reversible. To do so, we can use hash functions or symmetric block cipher.\\
+We can use hashes as MAC, but we have to be cautious on constructing them: if we use MAC$=MD(K_{AB}||msg)$, someone could perform a \textit{length extension attack}:
+\begin{itemize}
+    \item Alice sends "message, MAC" to Bob
+    \item an attacker can construct an extension MAC'$=MD(MAC||msg')=MD(K_{AB}||msg||msg')$
+\end{itemize}
+To avoid this, we can construct the MAC differently:
+\begin{itemize}
+    \item MAC$=MD(msg||K_{AB})$
+    \item Use only half of $MD$ (not extensible)
+    \item Use MAC$=MD(MD(K_{AB}||msg))$
+\end{itemize}
+
+\subsection{HMAC}
+HMAC is the standard MAC used in IPSec. It can use different hash functions, and what it does is to compute $h(K_{AB}\xor a || h(K_{AB}\xor b ||m))$, where $a$ and $b$ are two constants. With this structure, even if the attacker found $m'$ such that $m\neq m'$ and $h(m)=h(m')$, he would still be unable to "swap out" $m$ due to the prefixed key and the double hash.
+
+\subsection{CBC-MAC}
+An alternative to HMAC is CBC-MAC, that is simply the last ciphertext block of CBC (with $IV=0$). CBC-MAC is only secure for fixed length messages, because with variable-length messages with the same key $k$, an attacker who knows the MACs of two different messages $m_1$ and $m_2$ can easily compute the MAC of a third message $m_3$, even if he does not know the key $k$.
+\begin{itemize}
+    \item Assume the attacker know two messages and their MACs $(m_1,t_1)$ and $(m_2,t_2)$
+    \item They create $m_3=m_1||m_2^*$, where $m_2^*$ is simply $m_2$ with the first block XORed with $t_1$
+    \item They know the MAC of $m_3$ must be $t_2$
+\end{itemize}
+
+\subsection{Digital signatures vs. MAC}
+We have to remember that there is a clear difference between digital signatures and MACs: a digital signature provides \textit{non-repudiation}, while MAC provides \textit{authenticity}

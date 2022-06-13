@@ -1,0 +1,35 @@
+\section{Web Security}
+\subsection{HTTP Authentication}
+\paragraph{Basic}
+The browser sends password in the clear (over encrypted connection HTTPS). The server has \texttt{.htpasswd} file containing hashed passwords.
+\paragraph{Digest}
+Uses nonces, timestamps, MD5 hashes, "opaque" server data.\\\\
+In practice, neither method is much used anymore, because they are not optimal for user experience (login process). The most used approach is to use HTTPS + HTML form.
+
+\subsection{DNS Spoofing}
+\textit{Domain Name Server} (DNS) spoofing is an attack in which altered DNS records are used to redirect online traffic to a fraudulent website that resembles its intended destination. The strategy used is the following:
+\begin{enumerate}
+    \item User wants to connect to \texttt{www.site.com}
+    \item Local DNS resolver sends UDP packet to DNS server for IP address
+    \begin{description}
+    \item[Note:] The first "matching" reply will be used to cache IP, so if attacker is faster than DNS resolver, his IP gets used
+    \end{description}
+    \item The attacker listen to outgoing traffic, identify DNS packets and send "fake" reply packets that match the query
+\end{enumerate}
+\textit{DNS-over-TLS} (DoT)/\textit{-over-HTTP} (DoH) adds confidentiality to DNS.
+
+\subsection{Homograph Attacks}
+Homograph attack is a way a malicious party may deceive computer users about what remote system they are communicating with, by exploiting the fact that many different characters look alike (e.g. latin letter vs. cyrillic letter). These type of attack are usually done to commit \textit{phishing} (obtain sensitive information by disguising as a trustworthy entity). A (partial) solution to this is \textit{Punycode}: in case a internet hostname contains letter of different alphabets, it get displayed in a easily detectable format (this solution does not hold if we use letters of only one alphabet).
+
+
+\subsection{Man-in-the-Middle SSL Attack}
+Due to a bug on Internet Explorer 7, leaf certificates can sign other leaf certificates, so an attacker can sign any SSL certificate, "proving" to a client that it is using the authentic site.
+
+
+\subsection{XSS - Cross Site Scripting Attack}
+Inject malicious script code into a (trusted) webpage a user is viewing, so that user‘s browser executes malicious code (the user will probably assume that the behavior is part of the original site). XSS is possible exploiting JavaScript issues, such as the fact that it can access and change any part of a web page. For this reason JavaScript added the \textit{Same Origin Policy} (SOP): origin needs to match domain, protocol \& port in order to read/write on the site.
+Another powerful way to avoid XSS is NoScript, a browser extension that allow JavaScript on originating server only
+
+
+\subsection{SQL Injection}
+SQL injection is a code injection technique used to attack data-driven applications, in which malicious SQL statements are inserted into an entry field for execution (e.g. to dump the database contents to the attacker). SQL injection must exploit a security vulnerability in an application's software (e.g. user input is incorrectly filtered for string literal escape characters embedded in SQL statements).

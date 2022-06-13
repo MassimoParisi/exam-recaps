@@ -1,0 +1,44 @@
+\section{Feistel Ciphers}
+An ideal (block) cipher should use ideal keys that can map any plain text block to any cipher block, but these kind of keys would need $2^n\cdot n$ bits, and that is impractical. For this reason we started using the so-called \textbf{Feistel Networks}, used in order to build an \underline{invertible} random permutation $E:P\leftrightarrow C$ using a \underline{non-invertible} random function $f$ as a building block. The basic building block of a Feistel cipher are permutation, substitution and XOR. 
+Given a list of round keys $[K_0,...,K_n]$, a Feistel cipher usually perform the following steps:
+\begin{itemize}
+    \item Split plaintext block $P$ into two equal halves $L_0$ and $R_0$
+    \item For each round $i$, it alternately
+    \begin{itemize}
+        \item Apply non-invertible function $F$ to one half (using $K_i$)
+        \item XOR the result onto the other half 
+    \end{itemize}
+    (e.g. $L_{i+1} = L_i \text{ and } R_{i+1} = R_i \xor F(K_i, L_i)$)
+    \item After $n$ rounds, concatenate $L_n$ and $R_n$ to obtain the ciphertext $C$
+\end{itemize}
+Feistel ciphers presents different advantages, like the fact that encryption and decryption use the same algorithm: in order to decrypt, we use the ciphertext as input and reverse the order of the keys.
+
+\subsection{DES}
+\textit{Data Encryption Standard}, or DES, is one of the most famous Feistel cipher. It consists of the following steps:
+\begin{enumerate}
+    \item Initial permutation (IP)
+    \begin{description}
+    \item[Note:] unless we are using 3-DES, this step does not help
+    \end{description}
+    \item 16 Feistel rounds
+    \item Swap and Inverse permutation (IP$^{-1}$)
+\end{enumerate}
+In the Feistel rounds we use the \textit{Mangler} function as $F$, that consist of:
+\begin{enumerate}
+    \item Expansion ($32\rightarrow 48$ bits)
+    \item XOR with $K_i$
+    \item \underline{Non-linear} Substitution (with S-boxes)
+    \begin{description}
+    \item[Note:] S-boxes design is unclear (slight changes can affect security)
+    \end{description}
+    \item Permutation (with P-boxes)
+\end{enumerate}
+\subsubsection{Multi-DES}
+Simple DES has been cracked (bruteforce), so stronger version of DES has been created:
+\begin{itemize}
+    \item 2DES: encrypt twice (with 2 different keys)
+    \begin{description}
+    \item[Note:] it can be subject to a \textit{"Meet in the middle"} attack
+    \end{description}
+    \item 3DES: encrypt three times (with 2 or 3 different keys)
+\end{itemize}

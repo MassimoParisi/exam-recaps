@@ -1,0 +1,37 @@
+\section{Basic Crypto}
+\subsection{InfoSec objectives}
+The main objectives of information security are:
+\begin{itemize}
+    \item \textbf{Confidentiality}: allow only authorized access to information
+    \item \textbf{Integrity}: No unauthorized alteration of data
+    \item \textbf{Availability}: information is available to authorized users at all times
+    \item \textbf{Authenticity}: 
+        \begin{itemize}
+            \item \textit{Data origin authentication}: messages originates from claimed source
+            \item \textit{Entity authentication}: identification of current source and/or destination
+        \end{itemize}
+    \item \textbf{Non-repudiation}: prevents an entity from denying previous commitment or actions (e.g. using a digital signature)
+\end{itemize}
+\subsection{Terminology}
+\begin{itemize}
+    \item \textbf{Threat}: a potential for violation of security, possible action taken against you
+    \item \textbf{Attack}: an assault on system security, a deliberate attempt to exploit one or more vulnerabilities
+    \item \textbf{Vulnerability}: specific weakness in (or lack of) security services; a way in which threat can be realized
+    \item \textbf{Cryptography}: study of mathematical techniques to enforce security properties
+    \item \textbf{Cryptanalysis}: study of how to break cryptographic systems
+    \item \textbf{Diffusion}: dissipate plaintext structure into long-range stats in ciphertext (each plaintext bit should affect many ciphertext bits). Its goal is to achieve \textit{Avalanche effect} (switch $1$ bit $\rightarrow$ change at least half ciphertext)
+    \item \textbf{Confusion}: Ensure complex ciphertext—key relationship (each key bit should affect many ciphertext bits). Its goal is to achieve \textit{Completeness} (each ciphertext-bit depends on every key-bit)
+    \item \textbf{Kerckhoffs‘ Principle}: the security of the encryption scheme must depend only on the secrecy of the key $K_e$, and not on the secrecy of the algorithms.
+
+
+\end{itemize}
+\subsection{Historic Ciphers}
+\begin{itemize}
+    \item \textbf{Caesar}: a shift cipher in which each character get shifted by a fixed quantity: $c_i=m_i+3 (\bmod 26)\hspace{1em}$ (only 26 possible encryption)
+    \item \textbf{Improved Caesar}: remove all non-alphabet characters, use random order of letters (\textit{monoalphabetic} cipher). The key space is much bigger than the previous version ($\approx 2^{88}$) and a simple bruteforce will not work. If we know the language of the message, we can use frequency analysis
+    \item \textbf{Playfair}: encode digrams with $5\times 5$ matrix, insert $X$ in between repeating letters. If letters form square, take opposite corners (use letter on same row). If letters are on one row, shift right; if letters are in one column, shift down (wrap around if needed). We can still use frequency analysis to learn some information
+    \item \textbf{Vigenère}: different shift for each position, based on a secret keyword. Is it possible to exploit repeating segments of ciphertext (usually digrams/trigrams) and learn the length of the key. If the key length is known, we can try to break multiple monoalphabetic ciphers (using frequency analysis). One possible improvement is \textit{autokeying}, so after the key we continue to encrypt with the plaintext as key. This can still be broken with frequency analysis (English text encrypted with English text)
+    \item \textbf{Vernam (OTP)}: it is basically Vigenère with a random key that as the same length of the plaintext. OTP has been mathematically shown to be unbreakable (if you never EVER repeat the key). Nonetheless, it has serious limitation (we should have truly random keys without reuse, really big keys, key distribution problem)
+    %\item \textbf{Permutation/Transpostion}: Scytale Staff, Rail Fence Cipher, (Ordered) Route Cipher,Single/Double Transposition, etc.
+\end{itemize}
+

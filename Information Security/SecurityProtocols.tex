@@ -1,0 +1,132 @@
+\section{Security Protocols}
+Now that we have all the security primitives tools, we have to establish how should we use and combine them in order to have security protocols. We will examine three main type of protocols: authentication protocols, key distribution protocols and key establishment protocols.
+
+\subsection{How to store sensible data}
+Let's examine different login procedures, starting from naive approaches, understanding their problems and building up more safe ones.
+
+\subsubsection{Password list} A list containing all user password is stored, and if a user try to login with password $pwd$, we search for $pwd$.
+
+\subsubsection{Hashed password list} A list of hashed password is stored, if a user try to login with password $pwd$, we compute $hash(pwd)$ and search for it.
+\paragraph{Attack 1} Pre-compute a lookup table of hashes for the most common passwords. It grows very large and very quickly
+\paragraph{Attack 2} Use a \textbf{Rainbow table}:
+\begin{enumerate}
+    \item Find hashed password
+    \item Use reduction function to convert to (pass-)word
+    \item Try to find that word as an \textit{hash-chain end} in the table
+    \begin{enumerate}
+        \item If found, start from beginning of that hash-chain entry and hash/reduce/hash/reduce/etc, until you find password that hashes to observed hash
+        \item If not found, hash the word and reduce it, then restart at step 2
+    \end{enumerate}
+\end{enumerate}
+(N.B. a reduction function does not simply hash inverse, but map back the hash to the original password space $W$. Usually a rainbow table use different reduction function for each step)
+
+\subsubsection{Salted hash} For each password choose a \textit{salt}, that is a random number, and save the salt alongside $hash(salt||pwd)$. Salt increases rainbow-table effort: for each bit of salt we need to double the number of rainbow tables, so with a large salt (e.g. 128 bit) it becomes unfeasible. 
+\paragraph{Attack} Nonetheless, if the attacker gets access to the database the rainbow attacks becomes feasible (he would know the salt, that is saved in clear)
+
+\subsubsection{Salted hash + pepper} To avoid the aforementioned problem, we can improve security using $pepper$, another random number that is stored separately from the password database and that is common for all the users. 
+\paragraph{Attack} However, if even only one ($\texttt{salt + cleartext pwd})$ is known, the attacker could try to brute-force the pepper, so it must withstand brute-force attack (e.g. 112 bits)
+
+\subsection{Authentication protocols}
+In this section we will analyze how two entities can authenticates each other, avoiding attacks from malicious entities. We will focus on a family of protocols called \textit{Challenge-Response}, in which two nodes sends each other a value $N$ (the challenge) and expect some answer $f(K,N)$ (the response) from the other. As before, we will see different approaches, from the more naive to the more effective ones, keeping in mind that a good protocols should abide by the \textbf{Abadi-Needham} Protocols Design Guidelines:
+\begin{itemize}
+    \item \textbf{Be explicit} - every message should say what it means and its interpretation should only depend on its content. It's important to know clearly how encryption is used and how the timeliness of messages is proved
+    \item \textbf{State your assumptions} - the conditions for a message to be acted upon should be clearly set out so that someone reviewing a design may see whether they are acceptable or not
+\end{itemize}
+
+\subsubsection{Mutual Authentication}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} A||N_1$
+    \item $B\rightarrow A:\hspace{1em} N_2||f(K_{AB},N_1)$
+    \item $A\rightarrow B:\hspace{1em} f(K_{AB},N_2)$
+\end{enumerate}
+\paragraph{Reflection Attack} If the attacker $T$ start this protocol twice, he can authenticate in the following way:
+\begin{enumerate}
+    \item $T\rightarrow B:\hspace{1em} A||N_1$
+    \item $B\rightarrow T:\hspace{1em} N_2||f(K_{AB},N_1)$
+    {\color{teal} \item{$T\rightarrow B:\hspace{1em} A||N_2$}}
+    {\color{teal} \item $B\rightarrow T:\hspace{1em} N_3||f(K_{AB},N_2)$}
+    {\color{teal} \item $\texttt{[close]}$}
+    
+    \item $T\rightarrow B:\hspace{1em} f(K_{AB},N_2)$
+\end{enumerate}
+
+\subsubsection{Mutual Authentication with Trusted Server}
+Let's suppose that we have a trusted Key Distribution Center, or KDC (we will talk about them later), so that each node needs only one key shared with KDC. 
+
+\subsubsection{Woo\&Lam}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} A$
+    \item $B\rightarrow A:\hspace{1em} N_B$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AS},N_B)$
+    \item $B\rightarrow S:\hspace{1em} E(K_{BS}, A||E(K_{AS},N_B))$
+    \item $S\rightarrow B:\hspace{1em} E(K_{BS},N_B)$
+\end{enumerate}
+This authentication does not follow the Abadi-Needham rules.
+\subsubsection{Fixed Woo\&Lam}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} A$
+    \item $B\rightarrow A:\hspace{1em} N_B$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AS},N_B)$
+    \item $B\rightarrow S:\hspace{1em} \textbf{A}||E(K_{AS},N_B)$
+    \item $S\rightarrow B:\hspace{1em} E(K_{BS},\boldsymbol{A}||N_B)$
+\end{enumerate}
+Now the nonce $N_B$ is used only for freshness (and not for association), and there is no double encryption in step 4
+
+
+\subsection{Key distribution protocols}
+First of all, we want to introduce the concept of session key. A \textbf{session key} is a single-use symmetric key used for encrypting all messages in one communication session. There are different advantages on using session keys:
+\begin{itemize}
+    \item they limit the amount of ciphertext available
+    \item different keys for authentication \& integrity protection
+    \item compromise of long-term secret $\nRightarrow$ decryption of old messages
+\end{itemize}
+\paragraph{Forward Secrecy}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} \{N_A\}_{E_B}$
+    \item $B\rightarrow A:\hspace{1em} \{N_B\}_{E_A}$
+    \item Session key is $K_S=N_A\xor N_B$
+\end{enumerate}
+\paragraph{Perfect Forward Secrecy} (use signed DHM)
+\begin{enumerate}
+    \item $\texttt{Alice}\rightarrow \texttt{Bob}:\hspace{1em} \{g||p||A\}_{D_A}\hspace{3em} (A=g^a\Mod{p})$
+    \item $\texttt{Bob}\rightarrow \texttt{Alice}:\hspace{1em} \{B\}_{D_B}\hspace{3em} (B=g^b\Mod{p})$
+    \item $K_S=g^{ab}\Mod{p}$
+\end{enumerate}
+\subsection{Key establishment protocols}
+\subsubsection{Needham-Schroeder}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} A||B||N_1$
+    \item $S\rightarrow A:\hspace{1em} E(K_{AS},[N_1,||B||K_{AB}||\underbrace{E(K_{BS},[K_{AB}||A])}_{\texttt{ticket}}])$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_2)||\texttt{ticket}$
+    \item $B\rightarrow A:\hspace{1em} E(K_{AB},N_2-1||N_3)$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_3-1)$
+\end{enumerate}
+\paragraph{Attack} If we use ECB mode, an attacker can impersonate $A$. Moreover, the attacker could have cracked old session key $K_AB$.
+
+\paragraph{Timestamp-based alternative}
+\begin{enumerate}
+    \item $A\rightarrow B:\hspace{1em} A||B$
+    \item $S\rightarrow A:\hspace{1em} E(K_{AS},[\textbf{T}||B||K_{AB}||\underbrace{E(K_{BS},[K_{AB}||A||T])}_{\texttt{ticket}}])$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_1)||\texttt{ticket}$
+    \item $B\rightarrow A:\hspace{1em} E(K_{AB},N_1-1||N_2)$
+    \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_2-1)$
+\end{enumerate}
+In this way, is harder for an attacker to reply to message $3.$ much later
+
+\subsubsection{Kerberos Protocol}
+Kerberos is an authentication protocol, that introduces two new entities:
+\begin{itemize}
+    \item \textbf{Authentication Server (AS)} - it provides authentication credentials aka \textit{ticket granting ticket} (TGT)
+    \item \textbf{Ticket Granting Server (TGS)}: it provides the access to different services based on the TGT received
+\end{itemize}
+\paragraph{Overview}
+\begin{enumerate}
+    \item User logs on to workstation and requests service on host
+    \item AS verifies user's access right in database, creates TGT and session key. Results are encrypted using key derived from user's password
+    \item Workstation prompts user for password and uses password to decrypt incoming message, then sends ticket and authenticator that contains user's name, network address, and time to TGS
+    \item TGS decrypts ticket and authenticator, verifies request, then creates ticket for requested server
+    \item Workstation sends ticket and authenticator to server
+    \item Server verifies that ticket and authenticator match, then grants access to service. If mutual authentication is required, server returns an authenticator
+\end{enumerate}
+
+{\color{red} Secure Protocol Design Principles?}

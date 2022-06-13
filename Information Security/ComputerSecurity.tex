@@ -1,0 +1,44 @@
+\section{Computer Security}
+Access Control (AC) is the set of (limited) action a user can do in a system. We use AC to prevent security breaches. The main access rights to data and programs are \texttt{read}, \texttt{write} and \texttt{execute}.
+\subsection{General AC Principles}
+\begin{itemize}
+    \item System must first authenticate a user seeking access
+    \item Then, AC reference monitor determines if specific requested access by this user is permitted
+    \item A security administrator maintains an authorization database
+    \item An auditing function monitors and keeps a record of user accesses to system resources (accountability, flaws)
+\end{itemize}
+\subsection{ACLs vs. Capabilities}
+The authorization database can be organized in different way:
+\begin{itemize}
+    \item Access Control List (ACL), often used in filesystems, contains a list for each \texttt{object} containing the right of each \texttt{subject} on it
+    \item Capabilities is the dual of ACL. It contains a list for each \texttt{subject} containing the right on each \texttt{object}
+\end{itemize}
+\subsection{UNIX Permissions}
+UNIX used ACLs and for each \texttt{object}, it indicated the rights of the \textit{owner}, the \textit{group owner} and the \textit{world}
+\paragraph{SUID}
+UNIX also offer the possibility for using \textbf{SUID} root, that allow users to run an executable with the filesystem permissions of the executable's owner or group owner. They are often used to allow users on a computer system to run programs with temporarily elevated privileges in order to perform a specific task. The introduction of SUID root led to several security vulnerability.
+\paragraph{\texttt{sudo}} A better solution could be to use \texttt{sudo}, allowing selected users to temporarily become root (authenticating with their \texttt{pwd})
+
+\subsection{Types of AC Policies}
+\begin{itemize}
+    \item \textbf{Discretionary AC}: security decisions up to object owner, different defaults option possible, no coherent security policy enforceable
+    \item \textbf{Mandatory AC}: system-wide security policy enforcement, all objects and subjects have "security labels", access granted iff security labels "match", allows control of information flows
+\end{itemize}
+
+
+\subsubsection{Mandatory Access Policies Policy}
+\paragraph{BLP Model}
+The Bell-La Padula Model consists of two properties:
+\begin{itemize}
+    \item \textbf{Read Down}: a \texttt{subject}'s must dominate the security level of the \texttt{object} being read. More formally, $S$ can read $O$ iff $L_S \geq L_O \cap C_S \supseteq C_O$ and $S$ has discretionary read access to $O$
+    \item \textbf{Write Up}: a \texttt{subject}'s clearance must be dominated by the security level of the \texttt{object} being written to. More formally, $S$ can write to $O$ iff $L_S \leq L_O \cap C_S \subseteq C_O$ and $S$ has discretionary write access to $O$
+\end{itemize}
+
+\paragraph{Problem} High clearance subjects can never communicate with low clearance subjects, so we need dynamic security levels. BLP protects confidentiality, but not integrity
+
+\paragraph{Biba Model}
+It is a state machine model to ensure integrity with these property:
+\begin{itemize}
+    \item \textbf{Read Down}: a \texttt{object}'s integrity level must dominate the integrity level of the \texttt{subject} reading it ($I_O \geq I_S$)
+    \item \textbf{Write Up}: a \texttt{subject}'s integrity level must dominate the integrity level of the \texttt{object} being written to ($I_S \geq I_O$)
+\end{itemize}

@@ -1,0 +1,123 @@
+\section{Public Key Crypto}
+Public-key cryptography (or asymmetric cryptography) is a cryptographic system that uses pairs of keys. Each pair consists of a \textit{public key}, which may be known to others, and a \textit{private key}, which may not be known by anyone except the owner. The generation of such key pairs depends on cryptographic algorithms which are based on mathematical problems termed \textit{one-way functions}.
+
+\subsection{Diffie-Hellman-Merkle (DHM) Key Exchange}
+In order to understand how DHM works, we need to introduce some concepts.
+\paragraph{Primitive root} A number $a$ is a \textit{primitive root} of prime number $p$ if the numbers $a\Mod{p},a^2\Mod{p},...,a^{p-1}\Mod{p}$ generate all the integers from $1$ to $p-1$ in some permutation (not all integers have primitive roots)
+
+\paragraph{Discrete Logarithm} For any integer $b$ and primitive root $a$ of prime $p$ we can find a unique exponent $i$ s.t. $b\equiv a^i \Mod{p}$, with $i\in[0,p-1]$
+
+\subsubsection{DHM steps}
+In order to obtain a shared secret, Alice and Bob perform the following steps
+\begin{enumerate}
+    \item They publicly agree on $g$ (base) and $p$ (prime), where $g$ is primitive root of $p$.
+    \item They both pick a secrete value, respectively $A$ and $B$
+    \item They send each other respectively $g^A\Mod{p}$ and $g^B\Mod{p}$
+    \item They both raise the received message to the power of their private key, computing the same value $g^{AB}\Mod{p}$, that is now their shared secret
+\end{enumerate}
+The only public information that an attacker has are $(g,p)$, so he needs to find $(A,B)$ to compute the secret, but this is an hard problem to solve (\textit{discrete logarithm problem}). $g$ has to be a primitive root of $p$, in order to maximize the keyspace.
+\subsubsection{Man-in-the-Middle Attack}
+After Alice and Bob choose publicly $(g,p)$ and privately $(A,B)$, Mallory (an attacker) could do the following
+\begin{enumerate}
+    \item When Alice and Bob try to communicate, Mallory can intercept their message and answer to them with $g^M\Mod{p}$ (where $M$ is a private value of Mallory)
+    \item Both Alice and Bob end up computing a shared secret with Mallory, respectively $g^{AM}\Mod{p}$ and $g^{BM}\Mod{p}$, and Mallory does the same
+    \item Alice and Bob think that they are now sharing a secret, but they are actually communicating with Mallory, that can read every message and send it to the actual receiver
+\end{enumerate}
+
+\subsection{RSA}
+While DHM provides only encryption, RSA allow both encryption and authentication:
+\begin{itemize}
+    \item if Alice wants to encrypt a message $m$ to make it decryptable only for Bob, she can just encrypt it with Bob's public key
+    \item if Alice wants to send a message $m$ adding her digital signature, she can just encrypt it with her private key
+\end{itemize}
+\subsubsection{Mathematical background}
+In order to understand how RSA works, we need to learn some concepts
+
+
+\paragraph{Totient} the totient $\phi(n)$ of a number $n$ is the amount of number coprime with $n$. If $n=pq$ with $(p,q)$ primes, we know that $\phi(n)=(p-1)(q-1)$
+
+
+\paragraph{Euler's Theorem} In general \begin{itemize}
+    \item $a^b\Mod{n}=a^{(b\mod{\phi(n))}}\Mod{n}$
+    \item $b=1\Mod{\phi(n)} \implies a^b\Mod{n}=a$
+\end{itemize}
+
+
+\paragraph{}
+
+
+
+\subsubsection{RSA steps}
+\begin{enumerate}
+    \item Choose two large primes $(p,q)$
+    \item Compute $n=pq$
+    \item Choose $e$ s.t. $\texttt{gcd}(e,\phi(n))$
+    \item Find the multiplicative inverse $d$ s.t. $d\cdot e=1\Mod{\phi(n)}$
+    {\color{teal} \item Public key $E=[e,n]$, private key $D=[p,q,d]$}
+    \begin{itemize}
+        \item \textbf{Encrypt}: $c=m^e\Mod{n}$
+        \item \textbf{Decrypt}: $m=c^d\Mod{n}$
+        \item \textbf{Verify}: $m=s^e\Mod{n}$
+        \item \textbf{Sign}: $s=m^d\Mod{n}$
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{PowerMod}
+\textit{PowerMod} is a technique to easily compute large powers in modular arithmetic. Given a base $g$, an exponent $e$ and a modulo $p$, the steps to follow are the following:
+\begin{enumerate}
+    \item Convert $e$ to base 2
+    \item Initialize $x=g$, start from the leftmost bit of $e$ (skip the first $1$)
+    \begin{itemize}
+        \item if the current bit is $0$, $x=x^2\Mod{p}$
+        \item if the current bit is $1$, $x=(x^2\Mod{p})\cdot g \Mod{p}$
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Extended Euclidean Algorithm}
+We use this algorithm to solve the problem of finding the  multiplicative inverse. Its goal is to find $(x,y)$ s.t.
+\begin{equation*}
+    ax+by=k=\texttt{gcd}(a,b)
+\end{equation*}
+This helps us in finding the multiplicative inverse because, if $\texttt{gcd}(a,b)=1$, we have that $ax+by=1$. If we set $a=\phi(n)(=\phi)$ and $b=e$, we can say
+\begin{align*}
+    [\cancel{(\phi x \Mod\phi)} + (ey \Mod\phi)]\Mod\phi\equiv 1 \Mod\phi \\
+    ey\equiv 1 \Mod\phi
+\end{align*}
+This confirms that $\texttt{gcd}(e,\phi)=1$ and finds $d=y$
+
+\paragraph{Steps}
+\begin{wraptable}{r}{0.3\textwidth}
+\vspace{-10pt}
+\begin{tabular}{|c| c| c| c| c|} 
+\hline
+i & r_i & q_i & x_i & Y_i \\ [0.5ex] 
+\hline\hline
+-1 & 1759 &  & 1 & 0\\ 
+0 & 550 &  & 0 & 1\\
+1 & 109 & 3 & 1 & -3\\
+2 & 5 & 5 & -5 & 16\\
+3 & 4 & 21 & 106 & -339\\
+4 & 1 & 1 & -111 & {\color{blue} \textbf{355}}\\
+5 & 0 & 4 & & \\
+\hline
+\end{tabular}
+\end{wraptable}
+
+
+\begin{itemize}
+    \item Initialization
+    \begin{itemize}
+        \item $r_{-1}=a \hspace{2em}-r_0=b$
+        \item $x_{-1}=1 \hspace{2em}-x_0=0$
+        \item $y_{-1}=0 \hspace{2em}-y_0=1$
+    \end{itemize}
+    \item Each step, compute
+    \begin{itemize}
+        \item $r_{i+1}=r_{i-1} \Mod{r_i}$
+        \item $-q_{i+1}=\lfloor r_{i-1}/r_i\rfloor$
+        \item $x_{i+1}= x_{i-1}-q_{i+1}x_i$
+        \item $-y_{i+1}=y_{i-1}-q_{i+1}y_i$
+    \end{itemize}
+    \item Stop and find $d=y_n$ when $r_{n+1}=0$
+\end{itemize}
+Assume we are looking for multiplicative inverse of $e=550 \Mod{p=1759}$. See the result on the table.

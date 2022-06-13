@@ -1,0 +1,105 @@
+\documentclass[12pt]{article}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{makecell}
+\usepackage{graphicx,wrapfig,lipsum}
+\usepackage[makeroom]{cancel}
+\graphicspath{ {./images/} }
+\newcommand*\xor{\oplus}
+\newcommand*\conc{\mathbin\Vert}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{biblatex}
+\usepackage{placeins}
+\usepackage[shortlabels]{enumitem}
+\newcommand*\conc{\mathbin\Vert}
+\newcommand*\xor{\oplus}
+\newcommand{\Mod}[1]{ (\mathrm{mod}\ #1)}
+\newcommand{\todo}{\noindent{\color{red} \texttt{\#TODO\#}}}
+
+\addbibresource{references.bib}
+\newcolumntype{C}{>$c<$}
+
+
+
+
+
+
+
+\title{Computer Vision and Pattern Recognition}	
+\author{Massimo Parisi}
+% Make sure you write your name and surname on your solution!
+\date{Academic year 2021/2022}	
+
+\begin{document}
+%\maketitle
+
+{\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Università della Svizzera Italiana}\\[1.5cm] % Name of your university/college
+\textsc{\Large Information Security}\\[0.5cm] % Major heading such as course name
+\textsc{\large AA 2021/2022}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries InfoSec Summary}\\[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+\Large \emph{Author:}\\
+Massimo \textsc{Parisi}\\[1.5cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[scale=0.08]{images/usi-logo.png}\\[2cm] % Include a department/university logo - this will require the graphicx package
+
+%----------------------------------------------------------------------------------------
+%	COPYRIGHT SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[scale=0.4]{images/copyright.png}\\[1cm]
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
+}
+%----------------------------------------------------------------------------------------
+\newpage
+
+
+\tableofcontents
+
+\newpage
+\include{BasicCrypto.tex}
+\include{FeistelCiphers.tex}
+\include{AES.tex}
+\include{BlockModes.tex}
+\include{StreamCiphers.tex}
+\include{PublicKeyCrypto.tex}
+\include{Hashes.tex}
+\include{Macs.tex}
+\include{SecurityProtocols.tex}
+\include{Certificates.tex}
+\include{TLS.tex}
+\include{ComputerSecurity.tex}
+\include{WebSecurity.tex}
+\include{SoftwareSecurity.tex}
+
+\end{document}             % End of document.

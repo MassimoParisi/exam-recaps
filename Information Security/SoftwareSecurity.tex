@@ -1,0 +1,50 @@
+\section{Software Security}
+\subsection{The 7 Sins of Insecure Software}
+\begin{enumerate}
+    \item Improper input validation / representation
+    \item API abuse
+    \item Incorrect use/coding of security constructs
+    \item Incorrect assumptions re. time / state
+    \item Improper error handling According to
+    \item Incorrect assumptions regarding execution environment
+\end{enumerate}
+
+\subsection{Common Input Validation Errors}
+\begin{itemize}
+    \item \textbf{Buffer Over-Read}: Reading beyond boundaries of allocated memory (disclose secret data in adjacent memory cells)
+    \item \textbf{Buffer Overflow}: Writing outside boundaries of allocated memory (crash, corrupt data, execute malicious code)
+    \item \textbf{String Termination Error}: Relying on proper string termination (buffer overflow)
+    \item \textbf{Format String}: Allowing an attacker to control printf format string (buffer overflow)
+    \item \textbf{Integer Overflow}: Not accounting for integer overflow (logic errors, buffer overflow)
+    \item \textbf{Command Injection}: Executing commands from untrusted source (execute malicious commands)
+    \item \textbf{SQL Injection}: Exec SQL statements using unvalidated user input (execute arbitrary SQL commands)
+    \item \textbf{Cross-Site Scripting}: Sending unvalidated data to Web client (execute malicious commands on trusted site)
+\end{itemize}
+
+\subsection{Buffer Overflow}
+Buffer overflow is an anomaly where a program, while writing data to a buffer, overruns the buffer's boundary and overwrites adjacent memory locations. By sending in data designed to cause a buffer overflow, it is possible to write into areas known to hold executable code and replace it with malicious code.\\
+It is possible to fit arbitrary-sized shellcode on the stack: start shellcode after return address and fill the rest with “NOPsled”, in this way the return address needs to just point somewhere before shellcode.
+
+\paragraph{Protecting the stack}
+\begin{itemize}
+    \item Make stack non-executable
+    \item Use \textit{Canary} to detect overflows
+    \item Use separate stack for return address
+\end{itemize}
+\paragraph{Heap Corruption} Occurs when a program damages the allocator's view of the heap.
+\paragraph{Format String} Occurs when the submitted data of an input string is evaluated as a command by the application. In this way, the attacker could execute code, read the stack, or cause a segmentation fault in the running application, causing new behaviors that could compromise the security or the stability of the system.
+
+\subsection{Incorrect use of Time/State}
+\paragraph{TOCTTOU} \textit{Time-of-check to Time-of-use} is a class of software bugs caused by a race condition involving the checking of the state of a part of a system (such as a security credential) and the use of the results of that check.
+
+\subsection{The Saltzer-Schroeder Security Principles}
+\begin{enumerate}
+    \item \textbf{Fail-Safe Defaults}: protection mechanism should deny access by default, and grant access only when explicit permission exists.
+    \item \textbf{Complete Mediation}: mechanism should check every access to every object.
+    \item \textbf{Least Privilege}: mechanism should force every process to operate with the minimum privileges needed to perform task.
+    \item \textbf{Open Design}: protection should not depend on attackers being ignorant of its design to succeed. It may however be based on the attackers’ ignorance of specific information such as passwords or cipher keys.
+    \item \textbf{Separation of Privilege}: protection mechanism should grant access based on more than one piece of information.
+    \item \textbf{Economy of Mechanism}: the protection mechanism should have a simple and small design.
+    \item \textbf{Least Common Mechanism}: the protection mechanism should be shared as little as possible among users (e.g., process isolation).
+    \item \textbf{Psychological Acceptability}: the protection mechanism should be easy to use (at least as easy as not using it).
+\end{enumerate}
