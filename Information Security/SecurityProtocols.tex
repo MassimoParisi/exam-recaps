@@ -73,7 +73,7 @@ This authentication does not follow the Abadi-Needham rules.
 Now the nonce $N_B$ is used only for freshness (and not for association), and there is no double encryption in step 4
 
 
-\subsection{Key distribution protocols}
+\subsection{Key establishment protocols}
 First of all, we want to introduce the concept of session key. A \textbf{session key} is a single-use symmetric key used for encrypting all messages in one communication session. There are different advantages on using session keys:
 \begin{itemize}
     \item they limit the amount of ciphertext available
@@ -92,20 +92,20 @@ First of all, we want to introduce the concept of session key. A \textbf{session
     \item $\texttt{Bob}\rightarrow \texttt{Alice}:\hspace{1em} \{B\}_{D_B}\hspace{3em} (B=g^b\Mod{p})$
     \item $K_S=g^{ab}\Mod{p}$
 \end{enumerate}
-\subsection{Key establishment protocols}
+\subsection{Key distribution protocols}
 \subsubsection{Needham-Schroeder}
 \begin{enumerate}
-    \item $A\rightarrow B:\hspace{1em} A||B||N_1$
+    \item $A\rightarrow S:\hspace{1em} A||B||N_1$
     \item $S\rightarrow A:\hspace{1em} E(K_{AS},[N_1,||B||K_{AB}||\underbrace{E(K_{BS},[K_{AB}||A])}_{\texttt{ticket}}])$
     \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_2)||\texttt{ticket}$
     \item $B\rightarrow A:\hspace{1em} E(K_{AB},N_2-1||N_3)$
     \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_3-1)$
 \end{enumerate}
-\paragraph{Attack} If we use ECB mode, an attacker can impersonate $A$. Moreover, the attacker could have cracked old session key $K_AB$.
+\paragraph{Attack} If we use ECB mode, an attacker can impersonate $A$. Moreover, the attacker could have cracked old session key $K_{AB}$.
 
 \paragraph{Timestamp-based alternative}
 \begin{enumerate}
-    \item $A\rightarrow B:\hspace{1em} A||B$
+    \item $A\rightarrow S:\hspace{1em} A||B$
     \item $S\rightarrow A:\hspace{1em} E(K_{AS},[\textbf{T}||B||K_{AB}||\underbrace{E(K_{BS},[K_{AB}||A||T])}_{\texttt{ticket}}])$
     \item $A\rightarrow B:\hspace{1em} E(K_{AB},N_1)||\texttt{ticket}$
     \item $B\rightarrow A:\hspace{1em} E(K_{AB},N_1-1||N_2)$

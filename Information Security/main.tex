@@ -6,6 +6,15 @@
 \usepackage{makecell}
 \usepackage{graphicx,wrapfig,lipsum}
 \usepackage[makeroom]{cancel}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+    colorlinks=false, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
+
+
 \graphicspath{ {./images/} }
 \newcommand*\xor{\oplus}
 \newcommand*\conc{\mathbin\Vert}
@@ -28,7 +37,6 @@
 
 
 
-\title{Computer Vision and Pattern Recognition}	
 \author{Massimo Parisi}
 % Make sure you write your name and surname on your solution!
 \date{Academic year 2021/2022}	
